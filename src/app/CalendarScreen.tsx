@@ -11,6 +11,9 @@ import Checkbox from '@mui/material/Checkbox';
 import Avatar from '@mui/material/Avatar';
 import { useEffect, useState } from 'react';
 import { getCalendarsEndpoint, getEventsEndpoint, ICalendar, IEvent } from './backend';
+import { formatMonth, addMonth } from '../dateFunctions';
+import { useParams } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const estilo = {
     table: {
@@ -51,10 +54,12 @@ const estilo = {
 const DAYS_OF_WEEK = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 
 export function CalendarScreen() {
+    const { month } = useParams<{ month: string }>();
+
     const [events, setEvents] = useState<IEvent[]>([]);
     const [calendars, setCalendars] = useState<ICalendar[]>([]);
     const [calendarsSelected, setCalendarsSelected] = useState<boolean[]>([]);
-    const weeks = generateCalendar(getToday(), events, calendars, calendarsSelected);
+    const weeks = generateCalendar(month + "-01", events, calendars, calendarsSelected);
     const firstDate = weeks[0][0].date;
     const lastDate = weeks[weeks.length - 1][6].date;
 
@@ -93,14 +98,16 @@ export function CalendarScreen() {
             <Box flex="1" display="flex" flexDirection="column">
                 <Box display="flex" alignItems={'center'} padding="8px 16px">
                     <Box >
-                        <IconButton aria-label='mês anterior'>
+                        <IconButton aria-label='mês anterior' component={Link} to={{ pathname: "/calendar/" + addMonth(month!, -1) }}>
                             <Icon>chevron_left</Icon>
                         </IconButton>
-                        <IconButton aria-label='Próximo mês'>
+                        <IconButton aria-label='Próximo mês' component={Link} to={{ pathname: "/calendar/" + addMonth(month!, 1) }}>
                             <Icon>chevron_right</Icon>
                         </IconButton>
                     </Box>
-                    <Box flex={1} marginLeft={'16px'} component={'h3'}>Junho de 2022</Box>
+                    <Box flex={1} marginLeft={'16px'} component={'h3'}>
+                        {formatMonth(month!)}
+                    </Box>
                     <Box>
                         <IconButton aria-label='Usuário'>
                             <Avatar>
@@ -200,6 +207,3 @@ function generateCalendar(date: string, allEvents: IEvent[], calendars: ICalenda
     return weeks;
 }
 
-function getToday() {
-    return '2021-06-30';
-}

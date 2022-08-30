@@ -10,12 +10,23 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { ICalendar } from './backend';
+
+export interface IEditingEvent {
+    id?: number;
+    date: string;
+    time?: string;
+    desc: string;
+    calendarId: number;
+}
 
 interface IEventFormDialogProps {
-    open: boolean;
+    event: IEditingEvent | null;
+    calendars: ICalendar[];
     onClose: () => void;
 }
 export function EventFormDialog(props: IEventFormDialogProps) {
+    const { event } = props;
     const [age, setAge] = React.useState('');
 
     const handleChange = (event: SelectChangeEvent) => {
@@ -24,45 +35,51 @@ export function EventFormDialog(props: IEventFormDialogProps) {
 
     return (
         <div>
-            <Dialog open={props.open} onClose={props.onClose}>
+            <Dialog open={!!event} onClose={props.onClose}>
                 <DialogTitle>Criar Evento</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        type={'date'}
-                        margin="normal"
-                        label="Data"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        autoFocus
-                        margin="normal"
-                        label="Descrição"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        type={'time'}
-                        margin="normal"
-                        label="Hora"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl margin='normal' fullWidth>
-                            <InputLabel id="select-calendar">Agenda</InputLabel>
-                            <Select
-                                labelId="select-calendar"
-                                id="demo-simple-select"
-                                value={age}
-                                label="Select-Calendar"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>Pessoal</MenuItem>
-                                <MenuItem value={2}>Trabalho</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
+                    {event && <>
+                        <TextField
+                            type={'date'}
+                            margin="normal"
+                            label="Data"
+                            fullWidth
+                            variant="standard"
+                            value={event.date}
+                        />
+                        <TextField
+                            autoFocus
+                            margin="normal"
+                            label="Descrição"
+                            fullWidth
+                            variant="standard"
+                            value={event.desc}
+                        />
+                        <TextField
+                            type={'time'}
+                            margin="normal"
+                            label="Hora"
+                            fullWidth
+                            variant="standard"
+                            value={event.time}
+                        />
+                        <Box sx={{ minWidth: 120 }}>
+                            <FormControl margin='normal' fullWidth>
+                                <InputLabel id="select-calendar">Agenda</InputLabel>
+                                <Select
+                                    labelId="select-calendar"
+                                    id="demo-simple-select"
+                                    value={age}
+                                    label="Select-Calendar"
+                                    onChange={handleChange}
+                                >
+                                    {props.calendars.map(calendar => <MenuItem key={calendar.id} value={calendar.id}>{ }</MenuItem>)}
+
+                                    <MenuItem value={2}>Trabalho</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </>}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={props.onClose}>Cancelar</Button>
